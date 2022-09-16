@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 
 from .models import Post, Group, User
+from .forms import PostForm
 
 
 def index(request):
@@ -63,3 +64,7 @@ def post_detail(request, post_id):
         'posts_count': posts_count,
     }
     return render(request, template, context)
+
+
+def post_create(request):
+    pass
