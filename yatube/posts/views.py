@@ -1,4 +1,5 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy
 from django.conf import settings
 from django.core.paginator import Paginator
 
@@ -8,8 +9,7 @@ from .forms import PostForm
 
 def index(request):
     template = 'posts/index.html'
-    posts = Post.objects.select_related(
-        'author', 'group')
+    posts = Post.objects.select_related('author', 'group')
     paginator = Paginator(posts, settings.POSTS_PER_PAGE)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -67,4 +67,45 @@ def post_detail(request, post_id):
 
 
 def post_create(request):
-    pass
+    template = 'posts/create_post.html'
+    form = PostForm()
+    context = {
+        'action_url': reverse_lazy('posts:post_create'),
+        'form': form,
+    }
+
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            post_obj = form.save(commit=False)
+            post_obj.author = request.user
+            post_obj.save()
+            return redirect('posts:profile', username=request.user.username)
+        return render(request, template, context)
+    return render(request, template, context)
+
+
+def post_edit(request, post_id):
+    template = 'posts/create_post.html'
+    instance = Post.objects.select_related('author', 'group').get(id=post_id)
+    if request.user != instance.author:
+        return redirect('posts:post_detail', post_id=post_id)
+
+    form = PostForm(instance=instance)
+    context = {
+        'action_url': reverse_lazy('posts:post_edit', args=(post_id,)),
+        'form': form,
+        'is_edit': True,
+    }
+
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            post_obj = form.save(commit=False)
+            post_obj.author = request.user
+            post_obj.save()
+            return redirect('posts:profile', username=request.user.username)
+        return render(request, template, context)
+    return render(request, template, context)
