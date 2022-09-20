@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-  {{ title }}
+  {{ post.text|truncatechars:30 }}
 {% endblock %}
 {% block content %}
   <div class="row">
