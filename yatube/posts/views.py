@@ -1,61 +1,45 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.conf import settings
-from django.core.paginator import Paginator
 
 from .models import Post, Group, User
 from .forms import PostForm
+from .utils import get_posts_page_obj
 
 
 def index(request):
-    template = 'posts/index.html'
     posts = Post.objects.select_related('author', 'group')
-    paginator = Paginator(posts, settings.POSTS_PER_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = get_posts_page_obj(request, posts)
     context = {
         'page_obj': page_obj,
     }
-    return render(request, template, context)
+    return render(request, 'posts/index.html', context)
 
 
 def group_posts(request, slug):
-    template = 'posts/group_list.html'
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.all()
-    paginator = Paginator(posts, settings.POSTS_PER_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = get_posts_page_obj(request, posts)
     context = {
         'group': group,
         'page_obj': page_obj,
     }
-    return render(request, template, context)
+    return render(request, 'posts/group_list.html', context)
 
 
 def profile(request, username):
-    template = 'posts/profile.html'
-    profile_user = User.objects.get(username=username)
-    posts = Post.objects.select_related(
-        'author',
-        'group'
-    ).filter(
-        author__username=username
-    ).all()
-    paginator = Paginator(posts, settings.POSTS_PER_PAGE)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    current_user = User.objects.get(username=username)
+    posts = current_user.posts
+    page_obj = get_posts_page_obj(request, posts)
     context = {
-        'profile_user': profile_user,
+        'current_user': current_user,
         'posts_count': posts.count(),
         'page_obj': page_obj,
     }
-    return render(request, template, context)
+    return render(request, 'posts/profile.html', context)
 
 
 def post_detail(request, post_id):
-    template = 'posts/post_detail.html'
-    post = Post.objects.select_related('author', 'group').get(id=post_id)
+    post = get_object_or_404(Post.objects.select_related('author', 'group'), id=post_id)
     title = post.text[:30]
     posts_count = post.author.posts.count()
     context = {
@@ -63,7 +47,7 @@ def post_detail(request, post_id):
         'post': post,
         'posts_count': posts_count,
     }
-    return render(request, template, context)
+    return render(request, 'posts/post_detail.html', context)
 
 
 def post_create(request):
