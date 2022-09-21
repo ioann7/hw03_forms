@@ -1,8 +1,7 @@
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, Page
+from django.core.handlers.wsgi import WSGIRequest
 from django.conf import settings
 from django.db.models.query import QuerySet
-from django.core.paginator import Page
-from django.core.handlers.wsgi import WSGIRequest
 
 
 def get_posts_page_obj(request: WSGIRequest,
