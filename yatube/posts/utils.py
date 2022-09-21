@@ -5,7 +5,6 @@ from django.core.paginator import Page
 from django.core.handlers.wsgi import WSGIRequest
 
 
-
 def get_posts_page_obj(request: WSGIRequest,
                        posts: QuerySet) -> Page:
     """Return posts page object."""
