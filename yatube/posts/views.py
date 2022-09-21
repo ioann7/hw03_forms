@@ -27,11 +27,11 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    current_user = User.objects.get(username=username)
-    posts = current_user.posts.all()
+    author = User.objects.get(username=username)
+    posts = author.posts.all()
     page_obj = get_posts_page_obj(request, posts)
     context = {
-        'current_user': current_user,
+        'author': author,
         'posts_count': posts.count(),
         'page_obj': page_obj,
     }
