@@ -30,7 +30,7 @@ class Group(models.Model):
 
 class Post(models.Model):
     text = models.TextField(
-        'Текст', 
+        'Текст',
         help_text='Введите текст поста'
     )
     pub_date = models.DateTimeField(
