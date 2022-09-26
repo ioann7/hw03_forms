@@ -30,4 +30,4 @@ class AboutURLTests(TestCase):
         for url in urls:
             with self.subTest(url=url):
                 response = self.guest_client.get(url)
-                self.assertEqual(response.status_code, HTTPStatus.OK.value)
+                self.assertEqual(response.status_code, HTTPStatus.OK)

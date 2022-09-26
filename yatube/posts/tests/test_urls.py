@@ -49,7 +49,7 @@ class PostURLTests(TestCase):
         for url in urls:
             with self.subTest(url=url):
                 response = self.guest_client.get(url)
-                self.assertEqual(response.status_code, HTTPStatus.OK.value)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_edit_url_exists_at_desired_location(self):
         """
@@ -57,7 +57,7 @@ class PostURLTests(TestCase):
         для редактирования владельцу поста.
         """
         response = self.authorized_client.get(self.POST_EDIT_URL)
-        self.assertEqual(response.status_code, HTTPStatus.OK.value)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_edit_url_redirect_on_post_detail(self):
         """
@@ -80,7 +80,7 @@ class PostURLTests(TestCase):
     def test_create_url_exists_at_desired_location(self):
         """Страница /create/ доступна авторизованному пользователю."""
         response = self.authorized_client.get('/create/')
-        self.assertEqual(response.status_code, HTTPStatus.OK.value)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_create_url_redirect_anonymous_on_login_url(self):
         """
@@ -93,7 +93,7 @@ class PostURLTests(TestCase):
     def test_404_url(self):
         """Страница /unexisting_page/ выдаёт 404 ошибку."""
         response = self.guest_client.get('/unexisting_page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND.value)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
