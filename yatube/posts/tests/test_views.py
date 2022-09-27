@@ -34,8 +34,14 @@ class PostPagesTests(TestCase):
     def test_created_post_is_displayed(self):
         names_urls = {
             'index': reverse('posts:index'),
-            'group_posts': reverse('posts:group_posts', self.group.slug),
-            'profile': reverse('posts:profile', self.user.username)
+            'group_posts': reverse(
+                'posts:group_posts',
+                kwargs={'slug': self.group.slug}
+            ),
+            'profile': reverse(
+                'posts:profile', 
+                kwargs={'username': self.user.username}
+            )
         }
         new_post = Post.create(
             text='new post',
@@ -85,7 +91,7 @@ class PostPagesTests(TestCase):
         group_slug_0 = post_group_0.slug
         group_description_0 = post_group_0.description
         self.assertEqual(post_text_0, 'test post text with group')
-        self.assertEqual(post_pub_date_0, self.post.pub_date)
+        self.assertEqual(post_pub_date_0, self.posts[-1].pub_date)
         self.assertEqual(post_author_0, self.author)
         self.assertEqual(post_group_0, self.group)
         self.assertEqual(group_title_0, 'test group')
@@ -94,7 +100,10 @@ class PostPagesTests(TestCase):
 
     def test_group_posts_page_show_correct_context(self):
         expected_group = self.group
-        url = reverse('posts:group_posts', expected_group)
+        url = reverse(
+            'posts:group_posts',
+            kwargs={'slug': expected_group.slug}
+        )
         response = self.authorized_client.get(url)
         self.assertIsInstance(response.context['group'], expected_group)
         for post in response.context['page_obj']:
@@ -103,7 +112,10 @@ class PostPagesTests(TestCase):
     def test_profile_page_show_correct_context(self):
         expected_author = self.user
         expected_posts_count = self.user.posts.count()
-        url = reverse('posts:profile', expected_author.username)
+        url = reverse(
+            'posts:profile',
+            kwargs={'username': expected_author.username}
+        )
         response = self.authorized_client.get(url)
         self.assertIsInstance(response.context['author'], expected_author)
         self.assertEqual(response.context['posts_count'], expected_posts_count)
@@ -113,7 +125,10 @@ class PostPagesTests(TestCase):
     def test_post_detail_page_show_correct_context(self):
         expected_post = self.post
         expected_posts_count = self.post.author.posts.count()
-        url = reverse('posts:post_detail', expected_post.id)
+        url = reverse(
+            'posts:post_detail',
+            kwargs={'post_id': expected_post.id}
+        )
         response = self.authorized_client.get(url)
         self.assertIsInstance(response.context['post'], expected_post)
         self.assertEqual(response.context['posts_count'], expected_posts_count)
