@@ -43,12 +43,12 @@ class PostPagesTests(TestCase):
                 kwargs={'username': self.user.username}
             )
         }
-        new_post = Post.create(
+        new_post = Post.objects.create(
             text='new post',
             author=self.user,
             group=self.group
         )
-        self.assertNotIn(new_post, self.group_without_posts.posts)
+        self.assertNotIn(new_post, self.group_without_posts.posts.all())
         for name, url in names_urls.items():
             with self.subTest(name=name):
                 response = self.authorized_client.get(url)
@@ -92,7 +92,7 @@ class PostPagesTests(TestCase):
         group_description_0 = post_group_0.description
         self.assertEqual(post_text_0, 'test post text with group')
         self.assertEqual(post_pub_date_0, self.posts[-1].pub_date)
-        self.assertEqual(post_author_0, self.author)
+        self.assertEqual(post_author_0, self.user)
         self.assertEqual(post_group_0, self.group)
         self.assertEqual(group_title_0, 'test group')
         self.assertEqual(group_slug_0, 'test-group')
@@ -105,9 +105,9 @@ class PostPagesTests(TestCase):
             kwargs={'slug': expected_group.slug}
         )
         response = self.authorized_client.get(url)
-        self.assertIsInstance(response.context['group'], expected_group)
+        self.assertEqual(response.context['group'], expected_group)
         for post in response.context['page_obj']:
-            self.assertIsInstance(post.group, expected_group)
+            self.assertEqual(post.group, expected_group)
 
     def test_profile_page_show_correct_context(self):
         expected_author = self.user
@@ -117,10 +117,10 @@ class PostPagesTests(TestCase):
             kwargs={'username': expected_author.username}
         )
         response = self.authorized_client.get(url)
-        self.assertIsInstance(response.context['author'], expected_author)
+        self.assertEqual(response.context['author'], expected_author)
         self.assertEqual(response.context['posts_count'], expected_posts_count)
         for post in response.context['page_obj']:
-            self.assertIsInstance(post.user, expected_author)
+            self.assertEqual(post.author, expected_author)
 
     def test_post_detail_page_show_correct_context(self):
         expected_post = self.post
@@ -130,7 +130,7 @@ class PostPagesTests(TestCase):
             kwargs={'post_id': expected_post.id}
         )
         response = self.authorized_client.get(url)
-        self.assertIsInstance(response.context['post'], expected_post)
+        self.assertEqual(response.context['post'], expected_post)
         self.assertEqual(response.context['posts_count'], expected_posts_count)
 
     def test_create_post_page_show_correct_context(self):
@@ -146,7 +146,10 @@ class PostPagesTests(TestCase):
 
     def test_edit_post_page_show_correct_context(self):
         expected_post_id = self.post.id
-        url = reverse('posts:post_edit', expected_post_id)
+        url = reverse(
+            'posts:post_edit',
+            kwargs={'post_id': expected_post_id}
+        )
         response = self.authorized_client.get(url)
         self.assertEqual(response.context['post_id'], expected_post_id)
         self.assertEqual(response.context['is_edit'], True)
@@ -187,8 +190,14 @@ class PaginatorViewsTest(TestCase):
         user = PaginatorViewsTest.user
         names_urls = {
             'index': reverse('posts:index'),
-            'group_posts': reverse('posts:group_posts', group.slug),
-            'profile': reverse('posts:profile', user.username),
+            'group_posts': reverse(
+                'posts:group_posts',
+                kwargs={'slug': group.slug}
+            ),
+            'profile': reverse(
+                'posts:profile',
+                kwargs={'username': user.username}
+            ),
         }
         for name, url in names_urls.items():
             with self.subTest(name=name):
@@ -201,9 +210,13 @@ class PaginatorViewsTest(TestCase):
         names_urls = {
             'index': reverse('posts:index') + '?page=2',
             'group_posts': reverse(
-                'posts:group_posts', group.slug) + '?page=2',
+                'posts:group_posts',
+                kwargs={'slug': group.slug}
+            ) + '?page=2',
             'profile': reverse(
-                'posts:profile', user.username) + '?page=2',
+                'posts:profile',
+                kwargs={'username': user.username}
+            ) + '?page=2',
         }
         for name, url in names_urls.items():
             with self.subTest(name=name):
