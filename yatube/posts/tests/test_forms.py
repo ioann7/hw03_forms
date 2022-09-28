@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -10,52 +11,56 @@ User = get_user_model()
 class PostFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.user = User.objects.create_user(username='qwerty')
+        cls.first_user = User.objects.create_user(username='qwerty')
         super().setUpClass()
         Post.objects.create(
             text='first test post',
-            author=cls.user
+            author=cls.first_user
         )
 
     def setUp(self):
+        self.user = User.objects.create_user(username='1234567890')
         self.authorized_client = Client()
-        self.authorized_client.force_login(PostFormTests.user)
+        self.authorized_client.force_login(self.user)
 
     def test_create_post(self):
         posts_count = Post.objects.count()
         form_data = {
             'text': 'test post',
-            'group': 'null',
+            'group': '',
         }
         response = self.authorized_client.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True
         )
-        self.assertEqual(Post.objects.count(), posts_count + 1)
         expected_redirect = reverse(
             'posts:profile',
-            kwargs={'username': PostFormTests.user.username}
+            kwargs={'username': self.user.username}
         )
         self.assertRedirects(response, expected_redirect)
+        self.assertEqual(Post.objects.count(), posts_count + 1)
         self.assertTrue(
             Post.objects.filter(
                 text='test post',
-                author=PostFormTests.user
+                author=self.user
             ).exists()
         )
 
     def test_post_edit(self):
         posts_count = Post.objects.count()
-        post_id = 0
+        post = Post.objects.first()
         url = reverse(
             'posts:post_edit',
-            kwargs={'post_id': post_id}
+            kwargs={'post_id': post.id}
         )
-        form_data = {
-            'text': 'edited post',
-            'group': 'null'
-        }
+        response = self.authorized_client.get(url)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        form_data = response.context['form'].initial
+        form_data['text'] = 'edited post'
+        # form_data = {
+        #     'text': 'edited post'
+        # }
         response = self.authorized_client.post(
             url,
             data=form_data,
@@ -63,14 +68,14 @@ class PostFormTests(TestCase):
         )
         expected_redirect = reverse(
             'posts:post_detail',
-            kwargs={'post_id': post_id}
+            kwargs={'post_id': post.id}
         )
         self.assertRedirects(response, expected_redirect)
         self.assertEqual(Post.objects.count(), posts_count)
+        print(Post.objects.get(id=post.id))
         self.assertTrue(
             Post.objects.filter(
-                id=post_id,
-                text='edited post',
-                author=PostFormTests.user
+                id=post.id,
+                text='edited post'
             )
         )
