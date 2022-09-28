@@ -18,17 +18,11 @@ class PostPagesTests(TestCase):
             slug='test-group',
             description='test-description'
         )
-        cls.posts = []
-        for i in range(6):
-            cls.posts.append(Post.objects.create(
-                text=f'test post text with group{i}',
-                author=cls.user,
-                group=cls.group
-            ))
-            cls.posts.append(Post.objects.create(
-                text=f'test post text without group{i}',
-                author=cls.user
-            ))
+        cls.post = Post.objects.create(
+            text='test post text with group',
+            author=cls.user,
+            group=cls.group
+        )
 
     def setUp(self):
         self.authorized_client = Client()
@@ -37,7 +31,7 @@ class PostPagesTests(TestCase):
     def test_pages_uses_correct_template(self):
         group = PostPagesTests.group
         user = PostPagesTests.user
-        post = PostPagesTests.posts[0]
+        post = PostPagesTests.post
         pages_names_template = {
             reverse('posts:index'): 'posts/index.html',
             reverse(
