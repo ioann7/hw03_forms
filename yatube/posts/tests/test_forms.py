@@ -24,7 +24,8 @@ class PostFormTests(TestCase):
     def test_create_post(self):
         posts_count = Post.objects.count()
         form_data = {
-            'text': 'test post'
+            'text': 'test post',
+            'group': 'null',
         }
         response = self.authorized_client.post(
             reverse('posts:post_create'),
@@ -51,7 +52,10 @@ class PostFormTests(TestCase):
             'posts:post_edit',
             kwargs={'post_id': post_id}
         )
-        form_data = {'text': 'edited post'}
+        form_data = {
+            'text': 'edited post',
+            'group': 'null'
+        }
         response = self.authorized_client.post(
             url,
             data=form_data,
