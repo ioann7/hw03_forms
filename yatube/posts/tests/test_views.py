@@ -11,7 +11,7 @@ User = get_user_model()
 
 class PostPagesTests(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='test_user')
+        self.user = User.objects.create_user(username='PostPagesTests')
         self.group = Group.objects.create(
             title='test group',
             slug='test-group',
@@ -172,7 +172,7 @@ class PaginatorViewsTest(TestCase):
             slug='test-group',
             description='test description group'
         )
-        cls.user = User.objects.create_user(username='qwerty')
+        cls.user = User.objects.create_user(username='PaginatorViewsTest')
         cls.posts = []
         for i in range(15):
             cls.posts.append(Post.objects.create(

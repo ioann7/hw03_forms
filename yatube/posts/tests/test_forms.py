@@ -11,7 +11,7 @@ User = get_user_model()
 class PostFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.first_user = User.objects.create_user(username='qwerty')
+        cls.first_user = User.objects.create_user(username='PostFormTests1')
         super().setUpClass()
         Post.objects.create(
             text='first test post',
@@ -19,7 +19,7 @@ class PostFormTests(TestCase):
         )
 
     def setUp(self):
-        self.user = User.objects.create_user(username='1234567890')
+        self.user = User.objects.create_user(username='PostFormTests2')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 

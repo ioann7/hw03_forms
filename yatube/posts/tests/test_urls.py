@@ -12,9 +12,9 @@ class PostURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create_user(username='test_user')
+        cls.user = User.objects.create_user(username='PostURLTests')
         cls.user_without_posts = User.objects.create_user(
-            username='another_user')
+            username='PostURLTests_another_user')
         cls.group = Group.objects.create(
             title='test title',
             slug='test-slug',
