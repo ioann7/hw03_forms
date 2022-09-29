@@ -22,6 +22,7 @@ class PostFormTests(TestCase):
         self.authorized_client.force_login(PostFormTests.user)
 
     def test_create_post(self):
+        """Валидная форма создаёт новый пост."""
         posts_count = Post.objects.count()
         form_data = {
             'text': 'test post',
@@ -46,6 +47,7 @@ class PostFormTests(TestCase):
         )
 
     def test_post_edit(self):
+        """Валидная форма изменяет пост с тем же id."""
         posts_count = Post.objects.count()
         post = Post.objects.first()
         url = reverse(

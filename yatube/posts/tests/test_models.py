@@ -24,13 +24,13 @@ class PostModelTest(TestCase):
         )
 
     def test_models_have_correct_objects_names(self):
-        """Проверяем str(Post) выводит ли первые 15 символом поля text"""
+        """Проверяем Post.__str__ выводит ли первые 15 символом поля text."""
         post = PostModelTest.post
         expected_value = post.text[:15]
         self.assertEqual(str(post), expected_value)
 
     def test_verbose_name(self):
-        """Проверяем verbose_name"""
+        """Проверяем verbose_name."""
         post = PostModelTest.post
         field_verboses = {
             'text': 'Текст',
@@ -44,6 +44,7 @@ class PostModelTest(TestCase):
                     post._meta.get_field(value).verbose_name, expected)
 
     def test_help_text(self):
+        """Проверяем help_text."""
         post = PostModelTest.post
         field_help_texts = {
             'text': 'Введите текст поста',
@@ -66,11 +67,13 @@ class GroupModelTest(TestCase):
         )
 
     def test_models_have_correct_names(self):
+        """Метод Group.__str__ выводит Group.title."""
         group = GroupModelTest.group
         expected_value = group.title
         self.assertEqual(str(group), expected_value)
 
     def test_verbose_name(self):
+        """Проверяем verbose_name."""
         group = GroupModelTest.group
         field_verboses = {
             'title': 'Заголовок',
@@ -83,6 +86,7 @@ class GroupModelTest(TestCase):
                     group._meta.get_field(value).verbose_name, expected)
 
     def test_help_text(self):
+        """Проверяем help_text."""
         group = GroupModelTest.group
         field_help_texts = {
             'title': 'Введите заголовок группы',

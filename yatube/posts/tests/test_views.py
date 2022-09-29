@@ -32,6 +32,10 @@ class PostPagesTests(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_created_post_is_displayed(self):
+        """
+        Созданный пост отображается на шаблонах:
+        index, group_posts, profile.
+        """
         names_urls = {
             'index': reverse('posts:index'),
             'group_posts': reverse(
@@ -55,6 +59,7 @@ class PostPagesTests(TestCase):
                 self.assertEqual(response.context['page_obj'][0], new_post)
 
     def test_pages_uses_correct_template(self):
+        """URL-адрес использует соответствующий шаблон."""
         pages_names_template = {
             reverse('posts:index'): 'posts/index.html',
             reverse(
@@ -81,6 +86,7 @@ class PostPagesTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_index_page_show_correct_context(self):
+        """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
         first_object = response.context['page_obj'][0]
         post_text_0 = first_object.text
@@ -99,6 +105,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(group_description_0, 'test-description')
 
     def test_group_posts_page_show_correct_context(self):
+        """Шаблон group_posts сформирован с правильным контекстом."""
         expected_group = self.group
         url = reverse(
             'posts:group_posts',
@@ -110,6 +117,7 @@ class PostPagesTests(TestCase):
             self.assertEqual(post.group, expected_group)
 
     def test_profile_page_show_correct_context(self):
+        """Шаблон profile сформирован с правильным контекстом."""
         expected_author = self.user
         expected_posts_count = self.user.posts.count()
         url = reverse(
@@ -123,6 +131,7 @@ class PostPagesTests(TestCase):
             self.assertEqual(post.author, expected_author)
 
     def test_post_detail_page_show_correct_context(self):
+        """Шаблон post_detail сформирован с правильным контекстом."""
         expected_post = self.post
         expected_posts_count = self.post.author.posts.count()
         url = reverse(
@@ -134,6 +143,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(response.context['posts_count'], expected_posts_count)
 
     def test_create_post_page_show_correct_context(self):
+        """Шаблон post_create сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:post_create'))
         form_fields = {
             'text': forms.fields.CharField,
@@ -145,6 +155,7 @@ class PostPagesTests(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_edit_post_page_show_correct_context(self):
+        """Шаблон post_edit сформирован с правильным контекстом."""
         expected_post_id = self.post.id
         url = reverse(
             'posts:post_edit',
@@ -186,6 +197,10 @@ class PaginatorViewsTest(TestCase):
         self.authorized_client.force_login(PaginatorViewsTest.user)
 
     def test_first_page_contains_10_records(self):
+        """
+        Первая страница шаблонов:
+        index, group_posts, profile отображает 10 постов.
+        """
         group = PaginatorViewsTest.group
         user = PaginatorViewsTest.user
         names_urls = {
@@ -205,6 +220,10 @@ class PaginatorViewsTest(TestCase):
                 self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_page_contains_5_records(self):
+        """
+        Вторая страница шаблонов:
+        index, group_posts, profile отображает 5 постов.
+        """
         group = PaginatorViewsTest.group
         user = PaginatorViewsTest.user
         names_urls = {
